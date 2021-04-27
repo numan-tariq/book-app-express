@@ -1,0 +1,20 @@
+[
+  {
+    "name": "Comedy",
+    "id": "1",
+    "createdAt": "12 April, 2021",
+    "updatedAt": "12 April, 2021"
+  },
+  {
+    "name": "Horror",
+    "id": "2",
+    "createdAt": "12 April, 2021",
+    "updatedAt": "12 April, 2021"
+  },
+  {
+    "name": "Fantasy",
+    "id": "3",
+    "createdAt": "12 April, 2021",
+    "updatedAt": "12 April, 2021"
+  }
+]

@@ -1,0 +1,32 @@
+[
+  {
+    "title": "Numan",
+    "id": "1",
+    "autherId": "1",
+    "genreId": "1",
+    "publishDate": "10 April, 2021",
+    "iban": "21012",
+    "createdAt": "12 April, 2021",
+    "updatedAt": "12 April, 2021"
+  },
+  {
+    "title": "Rehman",
+    "id": "2",
+    "autherId": "2",
+    "genreId": "2",
+    "publishDate": "10 April, 2021",
+    "iban": "21011",
+    "createdAt": "1 April, 2021",
+    "updatedAt": "12 April, 2021"
+  },
+  {
+    "title": "Ali",
+    "id": "3",
+    "autherId": "3",
+    "genreId": "3",
+    "publishDate": "10 April, 2021",
+    "iban": "21013",
+    "createdAt": "1 April, 2021",
+    "updatedAt": "12 April, 2021"
+  }
+]
