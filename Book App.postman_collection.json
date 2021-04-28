@@ -192,7 +192,7 @@
 							"variable": [
 								{
 									"key": "id",
-									"value": "93"
+									"value": "3"
 								}
 							]
 						}
@@ -231,18 +231,63 @@
 				{
 					"name": "Update Genre",
 					"request": {
-						"method": "GET",
+						"method": "PATCH",
 						"header": [],
-						"url": null
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Fantasy123\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:4000/v1/genre/:id",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "4000",
+							"path": [
+								"v1",
+								"genre",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "3"
+								}
+							]
+						}
 					},
 					"response": []
 				},
 				{
 					"name": "Delete Genre",
 					"request": {
-						"method": "GET",
+						"method": "DELETE",
 						"header": [],
-						"url": null
+						"url": {
+							"raw": "http://localhost:4000/v1/genre/:id",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "4000",
+							"path": [
+								"v1",
+								"genre",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "24"
+								}
+							]
+						}
 					},
 					"response": []
 				}
