@@ -1,4 +1,5 @@
-let authers = require('../../shared/data/author.json');
+const { Auther } = require('../../models')
+const { mongoIdRegex } = require('../../shared/common/regex')
 
 /**
  * @description Return all authers
@@ -8,7 +9,8 @@ let authers = require('../../shared/data/author.json');
  */
 exports.getAllAuther =  async (req, res) => {
   try {
-    return res.status(200).send(authers);
+    const authersList = await Auther.find({ isDeleted: false });
+    return res.status(200).send(authersList);
   } catch (err) {
     return handleError(res, err);
   }
@@ -23,7 +25,9 @@ exports.getAllAuther =  async (req, res) => {
 exports.getAutherById = async (req, res) => {
   try {
     const { id } = req.params;
-    const auther = authers.find(x => x.id === id);
+    if(!mongoIdRegex.test(id)) return res.status(404).send({ message: 'Author not Found!' });
+
+    const auther = await Auther.findOne({_id: id, isDeleted: false});
     if(!auther) return res.status(404).send({ message: 'Auther not Found'});
 
     return res.status(200).send(auther);
@@ -43,14 +47,10 @@ exports.addAuther = async (req, res) => {
     const { name } = req.body;
     if(!name && name.length == 0) return res.status(400).send({ message: 'Name must be a string with length greather than 0'});
 
-    const auther = {
-      id: `${Math.floor(Math.random() * 100) + 4}`,
-      name: name,
-      createdAt: new Date(),
-      updatedAt: new Date()
-    }
+    const auther = new Auther({ name });
+    await auther.save();
 
-    authers.push(auther);
+    auther.isDeleted = undefined;
     return res.status(201).send(auther);
   } catch (err) {
     return handleError(res, err);
@@ -66,18 +66,14 @@ exports.addAuther = async (req, res) => {
 exports.updateAuther = async (req, res) => {
   try {
     const { id } = req.params;
+    if(!mongoIdRegex.test(id)) return res.status(404).send({ message: 'Author not Found!' });
+
     const { name } = req.body;
     if(!name && name.length == 0) return res.status(400).send({ message: 'Name must be a string with length greather than 0'});
     
-    authers = authers.map(auther => {
-      if(auther.id === id) {
-        auther.name = name;
-        auther.updatedAt = new Date();
-      }
-      return auther;
-    });
+    const auther = await Auther.findOneAndUpdate({_id: id, isDeleted: false}, { name, updatedAt: new Date() }, {new: true});
 
-    return res.status(200).send(authers.find(x => x.id === id));
+    return res.status(200).send(auther);
   } catch (err) {
     return handleError(res, err);
   }
@@ -93,9 +89,10 @@ exports.deleteAuthor = async (req, res) => {
   try {
     const { id } = req.params;
 
-    authers = authers.filter(auther => auther.id !== id);
+    const auther = await Auther.findByIdAndUpdate(id, {isDeleted: true}, {new: true});
+    if(!auther) return res.status(404).send({ message: 'Auther not found!'});
     
-    return res.status(200).send({ message: `Auther with ${id} is deleted successfully!` });
+    return res.status(200).send({ message: `Auther with name ${auther.name} is deleted successfully!` });
   } catch (err) {
     return handleError(res, err);
   }

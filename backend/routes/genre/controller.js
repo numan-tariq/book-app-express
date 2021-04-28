@@ -1,4 +1,5 @@
-let genres = require('../../shared/data/genre.json');
+const { Genre } = require('../../models')
+const { mongoIdRegex } = require('../../shared/common/regex')
 
 /**
  * @description return all genres
@@ -8,7 +9,8 @@ let genres = require('../../shared/data/genre.json');
  */
 exports.getAllGenres = async (req, res) => {
   try {
-    return res.status(200).send(genres);
+    const genreList = await Genre.find({isDeleted: false});
+    return res.status(200).send(genreList);
   } catch (err) {
     return handleError(res, err);
   }
@@ -23,7 +25,9 @@ exports.getAllGenres = async (req, res) => {
 exports.getGenreById = async (req, res) => {
   try {
     const { id } = req.params;
-    const genre = genres.find(x => x.id === id);
+    if(!mongoIdRegex.test(id)) return res.status(404).send({ message: 'Genre not Found!' });
+
+    const genre = await Genre.findOne({_id: id, isDeleted: false});
     if(!genre) return res.status(404).send({ message: "Genre not found!" });
 
     return res.status(200).send(genre);
@@ -43,14 +47,11 @@ exports.addGenre = async (req, res) => {
     const { name } = req.body;
     if(!name && name.length == 0) return res.status(400).send({ message: 'Name must be a string with length greather than 0'});
 
-    const genre = {
-      id: `${Math.floor(Math.random() * 100) + 4}`,
-      name: name,
-      createdAt: new Date(),
-      updatedAt: new Date()
-    }
+    const genre = new Genre({name});
+    await genre.save();
 
-    genres.push(genre);
+    genre.isDeleted = undefined;
+
     return res.status(201).send(genre);
   } catch (err) {
     return handleError(res, err);
@@ -66,18 +67,14 @@ exports.addGenre = async (req, res) => {
 exports.updateGenre = async (req, res) => {
   try {
     const { id } = req.params;
+    if(!mongoIdRegex.test(id)) return res.status(404).send({ message: 'Genre not Found!' });
+
     const { name } = req.body;
     if(!name && name.length == 0) return res.status(400).send({ message: 'Name must be a string with length greather than 0'});
 
-    genres = genres.map(genre => {
-      if(genre.id === id) {
-        genre.name = name;
-        genre.updatedAt = new Date();
-      }
-      return genre;
-    });
+    const genre = await Genre.findOneAndUpdate({_id: id, isDeleted: false}, {name, updatedAt: new Date()}, {new: true});
 
-    return res.status(200).send(genres.find(x => x.id === id));
+    return res.status(200).send(genre);
   } catch (err) {
     return handleError(res, err);
   }
@@ -92,10 +89,11 @@ exports.updateGenre = async (req, res) => {
 exports.deleteGenre = async (req, res) => {
   try {
     const { id } = req.params;
+    if(!mongoIdRegex.test(id)) return res.status(404).send({ message: 'Genre not Found!' });
 
-    genres = genres.filter(genre => genre.id !== id);
+    const genre = await Genre.findByIdAndUpdate(id, {isDeleted: true}, {new: true});
     
-    return res.status(200).send({ message: `Genre with ${id} is deleted successfully!` });
+    return res.status(200).send({ message: `Genre with name ${genre.name} is deleted successfully!` });
   } catch (err) {
     return handleError(res, err);
   }

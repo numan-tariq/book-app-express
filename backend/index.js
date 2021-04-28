@@ -1,6 +1,9 @@
+// Loading env
+require('dotenv').config();
+
+// Imports
 const express = require('express');
 const http = require('http');
-const routes = require('./routes')
 
 // Express App
 const app = express();
@@ -8,9 +11,12 @@ const app = express();
 // MiddleWares
 app.use(express.json());
 
-routes(app);
+// DB
+require('./startup/db')();
 
 // Routes
+require('./routes')(app);
+
 app.use('', (req, res, next) => {
   return res.status(200).send('<h1>Express server is running here.</h1>');
 });
@@ -18,7 +24,7 @@ app.use('', (req, res, next) => {
 
 // Express app listener
 const server = http.createServer(app);
-const port = 4000;
+const port = process.env.port || 4001;
 server.listen(port, () => {
   console.log(`Express server is running on port: ${port}`);
 })
