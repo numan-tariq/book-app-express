@@ -72,6 +72,7 @@ exports.updateGenre = async (req, res) => {
     genres = genres.map(genre => {
       if(genre.id === id) {
         genre.name = name;
+        genre.updatedAt = new Date();
       }
       return genre;
     });

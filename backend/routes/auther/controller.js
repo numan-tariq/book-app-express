@@ -72,10 +72,11 @@ exports.updateAuther = async (req, res) => {
     authers = authers.map(auther => {
       if(auther.id === id) {
         auther.name = name;
+        auther.updatedAt = new Date();
       }
       return auther;
     });
-    
+
     return res.status(200).send(authers.find(x => x.id === id));
   } catch (err) {
     return handleError(res, err);
