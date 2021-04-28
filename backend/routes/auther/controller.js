@@ -58,7 +58,7 @@ exports.addAuther = async (req, res) => {
 }
 
 /**
- * @description Uodatre Author
+ * @description Update Author
  * @param {*} req 
  * @param {*} res 
  * @returns updated author
@@ -75,6 +75,7 @@ exports.updateAuther = async (req, res) => {
       }
       return auther;
     });
+    
     return res.status(200).send(authers.find(x => x.id === id));
   } catch (err) {
     return handleError(res, err);
