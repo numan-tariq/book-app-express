@@ -48,7 +48,7 @@
 							"variable": [
 								{
 									"key": "id",
-									"value": "6"
+									"value": "60895d291735093c819d1ba8"
 								}
 							]
 						}
@@ -91,7 +91,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"Mustafa123\"\n}",
+							"raw": "{\n    \"name\": \"Hassan\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -113,7 +113,7 @@
 							"variable": [
 								{
 									"key": "id",
-									"value": "6"
+									"value": "6089919a947d04507301e447"
 								}
 							]
 						}
@@ -140,7 +140,7 @@
 							"variable": [
 								{
 									"key": "id",
-									"value": "6"
+									"value": "60895d291735093c819d1ba8"
 								}
 							]
 						}
@@ -192,7 +192,7 @@
 							"variable": [
 								{
 									"key": "id",
-									"value": "3"
+									"value": "60897e716a8bfb45231ce33b"
 								}
 							]
 						}
@@ -235,7 +235,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"Fantasy123\"\n}",
+							"raw": "{\n    \"name\": \"Comedy123\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -257,7 +257,7 @@
 							"variable": [
 								{
 									"key": "id",
-									"value": "3"
+									"value": "60897e716a8bfb45231ce33b"
 								}
 							]
 						}
@@ -284,7 +284,179 @@
 							"variable": [
 								{
 									"key": "id",
-									"value": "24"
+									"value": "60897df05e239244ea785097"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Book",
+			"item": [
+				{
+					"name": "Get All Books",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:4000/v1/book",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "4000",
+							"path": [
+								"v1",
+								"book"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add a Book",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"Maths2\",\n    \"iban\": \"PK90CWIX4916914922931695\",\n    \"publishedDate\": \"2000-04-28T16:31:21.675Z\",\n    \"auther\": \"608991ec947d04507301e448\",\n    \"genre\": \"608991fb947d04507301e44a\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:4000/v1/book",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "4000",
+							"path": [
+								"v1",
+								"book"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Book by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:4000/v1/book/:id",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "4000",
+							"path": [
+								"v1",
+								"book",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "60899215947d04507301e44b"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Book",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"Urdu\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:4000/v1/book/:id",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "4000",
+							"path": [
+								"v1",
+								"book",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "60899215947d04507301e44b"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Book",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:4000/v1/book/:id",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "4000",
+							"path": [
+								"v1",
+								"book",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "6089922e947d04507301e44c"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Books of Auther",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:4000/v1/book/auther/:id",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "4000",
+							"path": [
+								"v1",
+								"book",
+								"auther",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "608991ec947d04507301e448"
 								}
 							]
 						}
