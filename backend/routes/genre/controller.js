@@ -9,8 +9,17 @@ const { mongoIdRegex } = require('../../shared/common/regex')
  */
 exports.getAllGenres = async (req, res) => {
   try {
-    const genreList = await Genre.find({isDeleted: false});
-    return res.status(200).send(genreList);
+    let { limit, offset } = req.query;
+    if(!limit || !offset) {
+      limti = '10';
+      offset = '0'
+    }
+
+    const genreList = await Genre.find({ isDeleted: false }).skip(parseInt(offset)).limit(parseInt(limit));
+
+    const totalGenres = await Genre.count({ isDeleted: false });
+
+    return res.status(200).send({ list: genreList, total: totalGenres });
   } catch (err) {
     return handleError(res, err);
   }

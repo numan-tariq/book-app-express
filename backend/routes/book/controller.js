@@ -11,7 +11,14 @@ const helper = require('./helper')
  */
 exports.getAllBooks =  async (req, res) => {
   try {
-    const books = await Book.find({ isDeleted: false }).populate([
+    let { limit, offset } = req.query;
+
+    if(!limit || !offset) {
+      limit = '10';
+      offset = '0';
+    }
+
+    const books = await Book.find({ isDeleted: false }).skip(parseInt(offset)).limit(parseInt(limit)).populate([
       {
         path: "auther",
         select: "_id name"
@@ -21,7 +28,10 @@ exports.getAllBooks =  async (req, res) => {
         select: "_id name"
       }
     ]);
-    return res.status(200).send(books);
+
+    const totalBooks = await Book.count({ isDeleted: false });
+
+    return res.status(200).send({ list: books, total: totalBooks });
   } catch (err) {
     return handleError(res, err);
   }
@@ -56,12 +66,24 @@ exports.getBookById = async (req, res) => {
   }
 }
 
+/**
+ * @description Get all books by an Author
+ * @param {*} req 
+ * @param {*} res 
+ * @returns books
+ */
 exports.getAllBooksOfAnAuthor = async (req, res) => {
   try {
+    let { limit, offset } = req.query;
+    if(!limit || !offset) {
+      limit = '10';
+      offset = '0'
+    }
+
     const { id } = req.params;
     if(!mongoIdRegex.test(id)) return res.status(404).send({ message: 'Author not Found!' });
 
-    const books = await Book.find({auther: id, isDeleted: false}).populate([
+    const books = await Book.find({auther: id, isDeleted: false}).skip(parseInt(offset)).limit(parseInt(limit)).populate([
       {
         path: "auther",
         select: "_id name"
@@ -72,12 +94,49 @@ exports.getAllBooksOfAnAuthor = async (req, res) => {
       }
     ]);
 
-    return res.status(200).send(books);
+    const totalBooks = books.length;
+
+    return res.status(200).send({ list: books, total: totalBooks});
   } catch (err) {
     return handleError(res, err);
   }
 }
 
+/**
+ * @description get all books by genre
+ * @param {*} req 
+ * @param {*} res 
+ * @returns books
+ */
+exports.getAllBooksByGenre = async (req, res) => {
+  try {
+    let { limit, offset } = req.query;
+    if(!limit || !offset) {
+      limit = '10';
+      offset = '0'
+    }
+
+    const { id } = req.params;
+    if(!mongoIdRegex.test(id)) return res.status(404).send({ message: 'Genre not Found!' });
+
+    const books = await Book.find({genre: id, isDeleted: false}).populate([
+      {
+        path: "auther",
+        select: "_id name"
+      }, 
+      {
+        path: "genre",
+        select: "_id name"
+      }
+    ]);
+
+    const totalBooks = books.length;
+
+    return res.status(200).send({ list: books, total: totalBooks});
+  } catch (err) {
+    return handleError(res, err);
+  }
+}
 /**
  * @description Add Book
  * @param {*} req 
