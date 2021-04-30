@@ -1,5 +1,5 @@
 exports.USER_TYPES = {
-  ADMIN: 0,
-  AUTHER: 1,
-  CUSTOMER: 2
+  ADMIN: 1,
+  AUTHER: 2,
+  CUSTOMER: 3
 }

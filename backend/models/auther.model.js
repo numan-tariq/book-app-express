@@ -3,7 +3,7 @@ const Joi = require('joi');
 Joi.objectId = require('joi-objectid')(Joi);
 
 const Auther = mongoose.model('auther', new mongoose.Schema({
-  firsrName: {
+  firstName: {
     type: String,
     required: true,
     minLength: 3,
@@ -39,7 +39,7 @@ const Auther = mongoose.model('auther', new mongoose.Schema({
 
 function validateAddAuther(auther) {
   const schema = Joi.object({
-    firsrName: Joi.string().min(3).max(30).required(),
+    firstName: Joi.string().min(3).max(30).required(),
     lastName: Joi.string().min(3).max(30).required(),
     profilePic: Joi.string().min(0),
     dob: Joi.date().required(),

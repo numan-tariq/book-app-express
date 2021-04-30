@@ -5,7 +5,7 @@ exports.getBookById =  async (id) => {
     const auther = await Auther.findOne({_id: id, isDeleted: false}).populate([
       {
         path: "user",
-        select: "_id email"
+        select: "_id email userType"
       }
     ])
     if(!auther) return null

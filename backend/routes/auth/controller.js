@@ -16,7 +16,7 @@ exports.login = async (req, res) => {
     if(error) return res.status(400).send(error.details[0]);
 
     // Fetching user
-    const user = await User.findOne({ email: req.body.email }).select('_id email userType');
+    let user = await User.findOne({ email: req.body.email }).select('_id email userType password');
     if(!user) return res.status(400).send({ message: 'Invalid Email or Password' });
 
     // Validatating Password
@@ -24,30 +24,48 @@ exports.login = async (req, res) => {
     if(!result) return res.status(400).send({ message: 'Invalid Email or Password' });
 
     // Profile if exist
+    let profile = null;
     if(user.userType === USER_TYPES.ADMIN) {
-      user.profile = null;
+      profile = null;
     } else if(user.userType === USER_TYPES.AUTHER) {
-      user.profile = await Auther.findOne({ userId: user._id });
+      profile = await Auther.findOne({ user: user._id });
     } else if(user.userType === USER_TYPES.CUSTOMER) {
-      user.profile = await Customer.findOne({ userId: user._id });
+      profile = await Customer.findOne({ user: user._id });
     }
 
-    return res.status(200).send(user);
+    user.password = undefined;
+    return res.status(200).send({ ...user._doc, profile});
   } catch (err) {
     return handleError(res, err);
   }
 }
 
+/**
+ * @description Add new user
+ * @param {*} req 
+ * @param {*} res 
+ * @returns added user
+ */
 exports.signup = async (req, res) => {
   try {
     const { error } = validateSignup(req.body);
     if(error) return res.status(400).send(error.details[0]);
 
     // Check for existing email
-    const user = await User.findOne({ email: req.body.email }).select('_id email userType');
+    let user = await User.findOne({ email: req.body.email });
     if(user) return res.status(409).send({ message: 'User with this email already exist' });
 
+    const hashedPassword = await bcrypt.hash(req.body.password, 13);
+    if(!hashedPassword) return res.status(500).send({ message: 'Internal Server error.' });
 
+    user = new User({ ...req.body, password: hashedPassword });
+    user.save();
+
+    user.profile = null;
+    user.password = undefined;
+    user.isDeleted = undefined;
+
+    return res.status(201).send(user);
   } catch (err) {
     return handleError(res, err);
   }

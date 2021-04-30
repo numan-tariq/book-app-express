@@ -1,4 +1,4 @@
-const { Auther } = require('../../models')
+const { Auther, validateAddAuther, validateEditAuther } = require('../../models/auther.model')
 const { mongoIdRegex } = require('../../shared/common/regex')
 const helper = require('./helper')
 const { handleError } = require('../../shared/common/helper')
@@ -20,7 +20,7 @@ exports.getAllAuther =  async (req, res) => {
     const authersList = await Auther.find({ isDeleted: false }).skip(parseInt(offset)).limit(parseInt(limit)).populate([
       {
         path: 'user',
-        select: "_id email"
+        select: "_id email userType"
       }
     ])
 
@@ -46,7 +46,7 @@ exports.getAutherById = async (req, res) => {
     const auther = await Auther.findOne({_id: id, isDeleted: false}).populate([
       {
         path: 'user',
-        select: "_id email"
+        select: "_id email userType"
       }
     ]);
     if(!auther) return res.status(404).send({ message: 'Auther not Found'});
@@ -65,10 +65,10 @@ exports.getAutherById = async (req, res) => {
  */
 exports.addAuther = async (req, res) => {
   try {
-    const { name } = req.body;
-    if(!name && name.length == 0) return res.status(400).send({ message: 'Name must be a string with length greather than 0'});
+    const { error } = validateAddAuther(req.body);
+    if(error) return res.status(400).send(error.details[0]);
 
-    let auther = new Auther({ name });
+    let auther = new Auther({ ...req.body });
     await auther.save();
 
     auther = await helper.getBookById(auther._id);
@@ -96,7 +96,7 @@ exports.updateAuther = async (req, res) => {
     const auther = await Auther.findOneAndUpdate({_id: id, isDeleted: false}, { name, updatedAt: new Date() }, {new: true}).populate([
       {
         path: 'user',
-        select: "_id email"
+        select: "_id email userType"
       }
     ]);
 
