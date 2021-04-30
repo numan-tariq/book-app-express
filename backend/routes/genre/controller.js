@@ -1,5 +1,6 @@
 const { Genre } = require('../../models')
 const { mongoIdRegex } = require('../../shared/common/regex')
+const { handleError } = require('../../shared/common/helper')
 
 /**
  * @description return all genres
@@ -106,8 +107,4 @@ exports.deleteGenre = async (req, res) => {
   } catch (err) {
     return handleError(res, err);
   }
-}
-
-function handleError(res, err) {
-  return res.status(500).send({ message: `${err.code} - ${err.message}` });
 }

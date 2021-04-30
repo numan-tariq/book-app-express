@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const Joi = require('joi');
 Joi.objectId = require('joi-objectid')(Joi);
 
-const Auther = mongoose.model('auther', new mongoose.Schema({
+const Customer = mongoose.model('customer', new mongoose.Schema({
   firsrName: {
     type: String,
     required: true,
@@ -37,7 +37,7 @@ const Auther = mongoose.model('auther', new mongoose.Schema({
   }
 },{ versionKey: false, timestamps: true }))
 
-function validateAddAuther(auther) {
+function validateAddCustomer(customer) {
   const schema = Joi.object({
     firsrName: Joi.string().min(3).max(30).required(),
     lastName: Joi.string().min(3).max(30).required(),
@@ -45,10 +45,10 @@ function validateAddAuther(auther) {
     dob: Joi.date().required(),
     user: Joi.objectId().required()
   })
-  return schema.validate(auther);
+  return schema.validate(customer);
 }
 
-function validateEditAuther(auther) {
+function validateEditCustomer(customer) {
   const schema = Joi.object({
     firsrName: Joi.string().min(3).max(30),
     lastName: Joi.string().min(3).max(30),
@@ -56,9 +56,9 @@ function validateEditAuther(auther) {
     dob: Joi.date().required(),
     user: Joi.objectId()
   })
-  return schema.validate(auther);
+  return schema.validate(customer);
 }
 
-exports.validateAddAuther = validateAddAuther;
-exports.validateEditAuther = validateEditAuther;
-exports.Auther = Auther;
+exports.validateAddCustomer = validateAddCustomer;
+exports.validateEditCustomer = validateEditCustomer;
+exports.Customer = Customer;

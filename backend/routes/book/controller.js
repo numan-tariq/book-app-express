@@ -2,6 +2,7 @@ const { Auther, Genre } = require('../../models');
 const { Book, validateAddBook, validateEditBook } = require('../../models/book.model')
 const { mongoIdRegex } = require('../../shared/common/regex')
 const helper = require('./helper')
+const { handleError } = require('../../shared/common/helper')
 
 /**
  * @description Return all books
@@ -214,8 +215,4 @@ exports.deleteBook = async (req, res) => {
   } catch (err) {
     return handleError(res, err);
   }
-}
-
-function handleError(res, err) {
-  return res.status(500).send({ message: `${err.code} - ${err.message}` });
 }
