@@ -1,6 +1,7 @@
 
 const { Auther } = require('../../models')
-exports.getBookById =  async (id) => {
+
+exports.getAutherById =  async (id) => {
   try {
     const auther = await Auther.findOne({_id: id, isDeleted: false}).populate([
       {

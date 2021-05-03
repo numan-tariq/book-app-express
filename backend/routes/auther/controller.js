@@ -2,6 +2,7 @@ const { Auther, validateAddAuther, validateEditAuther } = require('../../models/
 const { mongoIdRegex } = require('../../shared/common/regex')
 const helper = require('./helper')
 const { handleError } = require('../../shared/common/helper')
+const { User } = require('../../models')
 
 /**
  * @description Return all authers
@@ -12,6 +13,7 @@ const { handleError } = require('../../shared/common/helper')
 exports.getAllAuther =  async (req, res) => {
   try {
     let { limit, offset } = req.query;
+    
     if(!limit || !offset) {
       limti = '10';
       offset = '0'
@@ -22,7 +24,7 @@ exports.getAllAuther =  async (req, res) => {
         path: 'user',
         select: "_id email userType"
       }
-    ])
+    ]);
 
     const totalAuthers = await Auther.count({ isDeleted: false });
 
@@ -43,15 +45,13 @@ exports.getAutherById = async (req, res) => {
     const { id } = req.params;
     if(!mongoIdRegex.test(id)) return res.status(404).send({ message: 'Author not Found!' });
 
-    const auther = await Auther.findOne({_id: id, isDeleted: false}).populate([
-      {
-        path: 'user',
-        select: "_id email userType"
-      }
-    ]);
-    if(!auther) return res.status(404).send({ message: 'Auther not Found'});
+    const user = await User.findOne({_id: id, isDeleted: false}).select("_id email userType");
+    if(!user) return res.status(404).send({ message: 'Auther not Found'});
 
-    return res.status(200).send(auther);
+    let profile = null;
+    profile = await Auther.findOne({user: id});
+
+    return res.status(200).send({ ...user._doc, profile });
   } catch (err) {
     return handleError(res, err);
   }

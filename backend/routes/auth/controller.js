@@ -3,6 +3,7 @@ const { validateLogin, validateSignup, User } = require('../../models/user.model
 const bcrypt = require('bcrypt');
 const { USER_TYPES } = require('../../shared/common/constant');
 const { Auther, Customer } = require('../../models');
+const jwt = require('jsonwebtoken');
 
 /**
  * @description user login
@@ -34,7 +35,10 @@ exports.login = async (req, res) => {
     }
 
     user.password = undefined;
-    return res.status(200).send({ ...user._doc, profile});
+
+    const access_token = jwt.sign({ ...user._doc }, process.env.SECRET);
+
+    return res.status(200).send({ ...user._doc, profile, access_token});
   } catch (err) {
     return handleError(res, err);
   }
@@ -59,13 +63,17 @@ exports.signup = async (req, res) => {
     if(!hashedPassword) return res.status(500).send({ message: 'Internal Server error.' });
 
     user = new User({ ...req.body, password: hashedPassword });
-    user.save();
+    await user.save();
 
     user.profile = null;
     user.password = undefined;
     user.isDeleted = undefined;
+    user.createdAt = undefined;
+    user.updatedAt = undefined;
 
-    return res.status(201).send(user);
+    const access_token = jwt.sign({ ...user._doc }, process.env.SECRET);
+
+    return res.status(201).send({ ...user._doc, access_token });
   } catch (err) {
     return handleError(res, err);
   }

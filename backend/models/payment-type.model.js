@@ -16,6 +16,11 @@ const PaymentType = mongoose.model('paymentType', mongoose.Schema({
   discount: {
     type: Number,
     default: 0
+  },  
+  isDeleted: {
+    type: Boolean,
+    default: false,
+    select: false
   }
 }, { versionKey: false, timestamps: true }))
 

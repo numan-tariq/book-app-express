@@ -1,5 +1,6 @@
 
 const { Book } = require('../../models')
+
 exports.getBookById =  async (id) => {
   try {
     const book = await Book.findOne({_id: id, isDeleted: false}).populate([
