@@ -7,8 +7,8 @@ const { USER_TYPES } = require('../../shared/common/constant');
 
 router.get('', controller.getAllPaymentTypes);
 router.get('/:id', controller.getPaymentTypeById);
-router.post('', isAuthenticated, isAuthorized({ hasRole: [USER_TYPES.ADMIN, USER_TYPES.CUSTOMER] }), controller.addPaymentType);
-router.patch('/:id', isAuthenticated, isAuthorized({ hasRole: [USER_TYPES.ADMIN, USER_TYPES.CUSTOMER] }), controller.updatePaymentType);
-router.delete('/:id', isAuthenticated, isAuthorized({ hasRole: [USER_TYPES.ADMIN, USER_TYPES.CUSTOMER] }), controller.deletePaymentType);
+router.post('', isAuthenticated, isAuthorized({ hasRole: [USER_TYPES.ADMIN] }), controller.addPaymentType);
+router.patch('/:id', isAuthenticated, isAuthorized({ hasRole: [USER_TYPES.ADMIN] }), controller.updatePaymentType);
+router.delete('/:id', isAuthenticated, isAuthorized({ hasRole: [USER_TYPES.ADMIN] }), controller.deletePaymentType);
 
 module.exports = router;

@@ -92,10 +92,10 @@ exports.updateAuther = async (req, res) => {
     const { id } = res.locals;
     if(!mongoIdRegex.test(id)) return res.status(404).send({ message: 'Author not Found!' });
 
-    const { firstName, lastName } = req.body;
-    if((!firstName && firstName.length == 0) || (!lastName && lastName.length == 0)) return res.status(400).send({ message: 'Name must be a string with length greather than 0'});
+    const { error } = validateEditAuther(req.body);
+    if(error) return res.status(400).send(error.details[0]);
     
-    const auther = await Auther.findOneAndUpdate({_id: id, isDeleted: false}, { firstName, lastName, updatedAt: new Date() }, {new: true}).populate([
+    const auther = await Auther.findOneAndUpdate({ user: id, isDeleted: false}, { ...req.body, updatedAt: new Date() }, {new: true, useFindAndModify: false }).populate([
       {
         path: 'user',
         select: "_id email userType"

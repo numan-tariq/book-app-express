@@ -1,7 +1,8 @@
 const { Customer, validateAddCustomer, validateEditCustomer } = require('../../models/cutomer.model');
-const { handleError } = require('../../shared/common/helper')
-const { mongoIdRegex } = require('../../shared/common/regex')
-const helper = require('./helper')
+const { handleError } = require('../../shared/common/helper');
+const { mongoIdRegex } = require('../../shared/common/regex');
+const helper = require('./helper');
+const { User } = require('../../models/user.model');
 
 /**
  * @description Return all Customers
@@ -44,15 +45,13 @@ exports.getAllCustomers = async (req, res) => {
     const { id } = req.params;
     if(!mongoIdRegex.test(id)) return res.status(404).send({ message: 'Customer not Found!' });
 
-    const customer = await Customer.findOne({_id: id, isDeleted: false}).populate([
-      {
-        path: 'user',
-        select: "_id email userType"
-      }
-    ]);
-    if(!customer) return res.status(404).send({ message: 'Customer not Found'});
+    const user = await User.findOne({_id: id, isDeleted: false}).select("_id email userType");
+    if(!user) return res.status(404).send({ message: 'Customer not Found'});
 
-    return res.status(200).send(customer);
+    let profile = null;
+    profile = await Customer.findOne({user: id});
+
+    return res.status(200).send({ ...user._doc, profile });
   } catch (err) {
     return handleError(res, err);
   }
@@ -71,7 +70,7 @@ exports.addCustomer = async (req, res) => {
     const { error } = validateAddCustomer(req.body);
     if(error) return res.status(400).send(error.details[0]);
 
-    let customer = new Customer({ ...req.body, customer: id });
+    let customer = new Customer({ ...req.body, user: id });
     await customer.save();
 
     customer = await helper.getCustomerById(customer._id);
@@ -90,13 +89,13 @@ exports.addCustomer = async (req, res) => {
  */
 exports.updateCustomer = async (req, res) => {
   try {
-    const { id } = req.locals;
+    const { id } = res.locals;
     if(!mongoIdRegex.test(id)) return res.status(404).send({ message: 'Customer not Found!' });
 
-    const { firstName, lastName } = req.body;
-    if((!firstName && firstName.length == 0) || (!lastName && lastName.length == 0)) return res.status(400).send({ message: 'Name must be a string with length greather than 0'});
+    const { error } = validateEditCustomer(req.body);
+    if(error) return res.status(400).send(error.details[0]);
     
-    const customer = await Customer.findOneAndUpdate({_id: id, isDeleted: false}, { firstName, lastName, updatedAt: new Date() }, {new: true}).populate([
+    const customer = await Customer.findOneAndUpdate({ user: id, isDeleted: false}, { ...req.body, updatedAt: new Date() }, {new: true, useFindAndModify: false}).populate([
       {
         path: 'user',
         select: "_id email userType"

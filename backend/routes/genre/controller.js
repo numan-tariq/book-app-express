@@ -1,6 +1,7 @@
 const { Genre } = require('../../models')
 const { mongoIdRegex } = require('../../shared/common/regex')
-const { handleError } = require('../../shared/common/helper')
+const { handleError } = require('../../shared/common/helper');
+const { USER_TYPES } = require('../../shared/common/constant');
 
 /**
  * @description return all genres

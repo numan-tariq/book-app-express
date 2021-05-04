@@ -32,8 +32,7 @@ const Customer = mongoose.model('customer', new mongoose.Schema({
   // Foriegn Keys
   user: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'user',
-    required: true
+    ref: 'user'
   }
 },{ versionKey: false, timestamps: true }))
 
@@ -42,8 +41,7 @@ function validateAddCustomer(customer) {
     firstName: Joi.string().min(3).max(30).required(),
     lastName: Joi.string().min(3).max(30).required(),
     profilePic: Joi.string().min(0),
-    dob: Joi.date().required(),
-    user: Joi.objectId().required()
+    dob: Joi.date().required()
   })
   return schema.validate(customer);
 }
@@ -53,8 +51,7 @@ function validateEditCustomer(customer) {
     firstName: Joi.string().min(3).max(30),
     lastName: Joi.string().min(3).max(30),
     profilePic: Joi.string().min(0),
-    dob: Joi.date().required(),
-    user: Joi.objectId()
+    dob: Joi.date()
   })
   return schema.validate(customer);
 }

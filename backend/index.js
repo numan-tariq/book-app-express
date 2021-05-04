@@ -28,3 +28,11 @@ const port = process.env.port || 4001;
 server.listen(port, () => {
   console.log(`Express server is running on port: ${port}`);
 })
+
+function apiCall(resolve, reject) {
+  if(Math.floor(Math.random()*1)) {
+    resolve({ message: 'OK'});
+  } else {
+    reject({ message: 'Rejected'});
+  }
+}

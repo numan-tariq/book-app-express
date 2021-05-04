@@ -49,10 +49,10 @@ function validateAddAuther(auther) {
 
 function validateEditAuther(auther) {
   const schema = Joi.object({
-    firsrName: Joi.string().min(3).max(30),
+    firstName: Joi.string().min(3).max(30),
     lastName: Joi.string().min(3).max(30),
     profilePic: Joi.string().min(0),
-    dob: Joi.date().required()
+    dob: Joi.date()
   })
   return schema.validate(auther);
 }
