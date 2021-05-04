@@ -26,7 +26,6 @@ exports.isAuthenticated = (req, res, next) => {
 
     // Verifing Token
     const response = jwt.verify(token, process.env.SECRET);
-    console.log('[RESPONSE]', response);
     if(!response) return res.status(401).send({ message: 'Unauthorized' });
 
     res.locals = {
