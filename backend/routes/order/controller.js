@@ -1,4 +1,5 @@
 const { Order, validateAddOrder, validateEditOrder } = require('../../models/order.model');
+const { USER_TYPES } = require('../../shared/common/constant');
 const { handleError } = require('../../shared/common/helper')
 const { mongoIdRegex } = require('../../shared/common/regex')
 const helper = require('./helper')
@@ -73,10 +74,17 @@ exports.getAllOrders = async (req, res) => {
  */
 exports.addOrder = async (req, res) => {
   try {
+    const { id, userType } = res.locals;
+    let customerId = id;
+
     const { error } = validateAddOrder(req.body);
     if(error) return res.status(400).send(error.details[0]);
 
-    let order = new Order({ ...req.body });
+    if(userType === USER_TYPES.ADMIN) {
+      customerId = req.body.customer;
+    }
+
+    let order = new Order({ ...req.body, customer: customerId });
     await order.save();
 
     order = await helper.getOrderById(order._id);
@@ -95,13 +103,22 @@ exports.addOrder = async (req, res) => {
  */
 exports.updateOrder = async (req, res) => { //Pending
   try {
-    const { id } = req.params;
-    if(!mongoIdRegex.test(id)) return res.status(404).send({ message: 'Order not Found!' });
+    const { id, userType } = res.locals;
+    let customerId = id;
+
+    const orderId = req.params.id;
+    if(!mongoIdRegex.test(orderId)) return res.status(404).send({ message: 'Order not Found!' });
 
     const { discount } = req.body;
     if(!discount && discount < 0 && discount > 100) return res.status(400).send({ message: 'Discount must be between 0 to 100'});
     
-    const order = await Order.findOneAndUpdate({_id: id, isDeleted: false}, { discount, updatedAt: new Date() }, {new: true}).populate([
+    let order = await Order.findOne({ _id: orderId, isDeleted: false }).select('customer');
+
+    if(userType === USER_TYPES.CUSTOMER && order.customer !== customerId) {
+      return res.stauts(403).send({ message: "Forbidden" });
+    }
+
+    order = await Order.findOneAndUpdate({_id: orderId, isDeleted: false}, { discount, updatedAt: new Date() }, {new: true}).populate([
       {
         path: 'customer',
         select: "_id firstName lastName"
@@ -126,9 +143,19 @@ exports.updateOrder = async (req, res) => { //Pending
  */
 exports.deleteOrder = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { id, userType } = res.locals;
+    let customerId = id;
 
-    const order = await Order.findByIdAndUpdate(id, {isDeleted: true}, {new: true});
+    const orderId = req.params.id;
+
+    // Fetching Order
+    let order = await Order.findOne({ _id: orderId, isDeleted: false }).select('customer');
+
+    if(userType === USER_TYPES.AUTHER && book.customer !== customerId) {
+      return res.stauts(403).send({ message: "Forbidden" });
+    }
+
+    order = await Order.findByIdAndUpdate(orderId, {isDeleted: true}, {new: true});
     if(!order) return res.status(404).send({ message: 'Order not found!'});
     
     return res.status(200).send({ message: `Order is deleted successfully!` });

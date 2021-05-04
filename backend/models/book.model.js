@@ -83,7 +83,6 @@ function validateEditBook(book) {
     images: Joi.array().min(0).max(5).items(Joi.string()).optional(),
     iban: Joi.string().regex(ibanRegex),
     publishedDate: Joi.date(),
-    auther: Joi.objectId(),
     genre: Joi.objectId()
   })
   return schema.validate(book);

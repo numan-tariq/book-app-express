@@ -66,10 +66,12 @@ exports.getAllCustomers = async (req, res) => {
  */
 exports.addCustomer = async (req, res) => {
   try {
+    const { id } = res.locals;
+
     const { error } = validateAddCustomer(req.body);
     if(error) return res.status(400).send(error.details[0]);
 
-    let customer = new Customer({ ...req.body });
+    let customer = new Customer({ ...req.body, customer: id });
     await customer.save();
 
     customer = await helper.getCustomerById(customer._id);
@@ -88,7 +90,7 @@ exports.addCustomer = async (req, res) => {
  */
 exports.updateCustomer = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { id } = req.locals;
     if(!mongoIdRegex.test(id)) return res.status(404).send({ message: 'Customer not Found!' });
 
     const { firstName, lastName } = req.body;

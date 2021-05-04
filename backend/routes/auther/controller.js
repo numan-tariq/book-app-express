@@ -40,7 +40,7 @@ exports.getAllAuther =  async (req, res) => {
  * @param {*} res 
  * @returns auther
  */
-exports.getAutherById = async (req, res) => {
+exports.getAutherByUserId = async (req, res) => {
   try {
     const { id } = req.params;
     if(!mongoIdRegex.test(id)) return res.status(404).send({ message: 'Author not Found!' });
@@ -65,13 +65,15 @@ exports.getAutherById = async (req, res) => {
  */
 exports.addAuther = async (req, res) => {
   try {
+    const { id } = res.locals;
+
     const { error } = validateAddAuther(req.body);
     if(error) return res.status(400).send(error.details[0]);
 
-    let auther = new Auther({ ...req.body });
+    let auther = new Auther({ ...req.body, user: id });
     await auther.save();
 
-    auther = await helper.getBookById(auther._id);
+    auther = await helper.getAutherById(auther._id);
 
     return res.status(201).send(auther);
   } catch (err) {
@@ -87,13 +89,13 @@ exports.addAuther = async (req, res) => {
  */
 exports.updateAuther = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { id } = res.locals;
     if(!mongoIdRegex.test(id)) return res.status(404).send({ message: 'Author not Found!' });
 
-    const { name } = req.body;
-    if(!name && name.length == 0) return res.status(400).send({ message: 'Name must be a string with length greather than 0'});
+    const { firstName, lastName } = req.body;
+    if((!firstName && firstName.length == 0) || (!lastName && lastName.length == 0)) return res.status(400).send({ message: 'Name must be a string with length greather than 0'});
     
-    const auther = await Auther.findOneAndUpdate({_id: id, isDeleted: false}, { name, updatedAt: new Date() }, {new: true}).populate([
+    const auther = await Auther.findOneAndUpdate({_id: id, isDeleted: false}, { firstName, lastName, updatedAt: new Date() }, {new: true}).populate([
       {
         path: 'user',
         select: "_id email userType"
@@ -119,7 +121,7 @@ exports.deleteAuthor = async (req, res) => {
     const auther = await Auther.findByIdAndUpdate(id, {isDeleted: true}, {new: true});
     if(!auther) return res.status(404).send({ message: 'Auther not found!'});
     
-    return res.status(200).send({ message: `Auther with name ${auther.name} is deleted successfully!` });
+    return res.status(200).send({ message: `Auther with name ${auther.firstName} is deleted successfully!` });
   } catch (err) {
     return handleError(res, err);
   }

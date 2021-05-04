@@ -2,7 +2,8 @@ const { Auther, Genre } = require('../../models');
 const { Book, validateAddBook, validateEditBook } = require('../../models/book.model')
 const { mongoIdRegex } = require('../../shared/common/regex')
 const helper = require('./helper')
-const { handleError } = require('../../shared/common/helper')
+const { handleError } = require('../../shared/common/helper');
+const { USER_TYPES } = require('../../shared/common/constant');
 
 /**
  * @description Return all books
@@ -82,7 +83,7 @@ exports.getAllBooksOfAnAuthor = async (req, res) => {
     }
 
     const { id } = req.params;
-    if(!mongoIdRegex.test(id)) return res.status(404).send({ message: 'Author not Found!' });
+    if(!mongoIdRegex.test(id)) return res.status(404).send({ message: 'Book not Found!' });
 
     const books = await Book.find({auther: id, isDeleted: false}).skip(parseInt(offset)).limit(parseInt(limit)).populate([
       {
@@ -146,16 +147,23 @@ exports.getAllBooksByGenre = async (req, res) => {
  */
 exports.addBook = async (req, res) => {
   try {
+    const { id, userType } = res.locals;
+    let autherId = id;
+
     const { error } = validateAddBook(req.body);
     if(error) return res.status(400).send(error.details[0]);
 
-    const auther = await Auther.findOne({_id: req.body.auther, isDeleted: false});
+    if(userType === USER_TYPES.ADMIN) {
+      autherId = req.body.auther;
+    }
+
+    const auther = await Auther.findOne({_id: autherId, isDeleted: false});
     if(!auther) return res.status(400).send({ message: "Invalid Auther ID"});
 
     const genre = await Genre.findOne({_id: req.body.genre, isDeleted: false});
     if(!genre) return res.status(400).send({ message: "Invalid Genre ID"});
 
-    let book = new Book(req.body);
+    let book = new Book({ ...req.body, auther: autherId });
     await book.save();
 
     book = await helper.getBookById(book._id);
@@ -174,14 +182,23 @@ exports.addBook = async (req, res) => {
  */
 exports.updateBook = async (req, res) => {
   try {
-    const { id } = req.params;
-    if(!mongoIdRegex.test(id)) return res.status(404).send({ message: 'Author not Found!' });
+    const { id, userType } = res.locals;
+    let autherId = id;
+
+    const bookId = req.params.id;
+    if(!mongoIdRegex.test(bookId)) return res.status(404).send({ message: 'Book not Found!' });
 
     const { error } = validateEditBook(req.body);
     if(error) return res.status(400).send(error.details[0]);
 
-    
-    const book = await Book.findOneAndUpdate({_id: id, isDeleted: false}, { ...req.body ,updatedAt: new Date() }, {new: true}).populate([
+    // Fetching book
+    let book = await Book.findOne({_id: bookId, isDeleted: false}).select('auther');
+
+    if(userType === USER_TYPES.AUTHER && book.auther !== autherId) {
+      return res.stauts(403).send({ message: "Forbidden" });
+    }
+
+    book = await Book.findOneAndUpdate({_id: bookId, isDeleted: false}, { ...req.body ,updatedAt: new Date() }, {new: true}).populate([
       {
         path: "auther",
         select: "_id name"
@@ -190,7 +207,7 @@ exports.updateBook = async (req, res) => {
         path: "genre",
         select: "_id name"
       }
-    ])
+    ]);
 
     return res.status(200).send(book);
   } catch (err) {
@@ -206,11 +223,21 @@ exports.updateBook = async (req, res) => {
  */
 exports.deleteBook = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { id, userType } = res.locals;
+    let autherId = id;
 
-    const book = await Book.findByIdAndUpdate(id, {isDeleted: true}, {new: true});
+    const bookId = req.params.id;
+
+    // Fetching book
+    let book = await Book.findOne({_id: bookId, isDeleted: false}).select('auther');
+
+    if(userType === USER_TYPES.AUTHER && book.auther !== autherId) {
+      return res.stauts(403).send({ message: "Forbidden" });
+    }
+
+    book = await Book.findByIdAndUpdate(bookId, {isDeleted: true}, {new: true});
     if(!book) return res.status(404).send({ message: 'Book not found!'});
-    
+
     return res.status(200).send({ message: `Book with name ${book.title} is deleted successfully!` });
   } catch (err) {
     return handleError(res, err);
