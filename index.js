@@ -18,7 +18,7 @@ require('./startup/db')();
 require('./routes')(app);
 
 app.use('', (req, res, next) => {
-  return res.status(200).send('<h1>Express server is running here.</h1>');
+  return res.status(200).send('<h1>Express server is running here on Heroku.</h1>');
 });
 
 // Express app listener
