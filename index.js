@@ -23,7 +23,7 @@ app.use('', (req, res, next) => {
 
 // Express app listener
 const server = http.createServer(app);
-const port = process.env.port || 4001;
+const port = process.env.PORT || 4001;
 server.listen(port, () => {
   console.log(`Express server is running on port: ${port}`);
 })
